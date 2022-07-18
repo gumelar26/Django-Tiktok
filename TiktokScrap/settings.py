@@ -71,6 +71,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'TiktokScrap.wsgi.application'
 
+SECURE_SSL_REDIRECT=False
+SESSION_COOKIE_SECURE=False
+CSRF_COOKIE_SECURE=False
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
