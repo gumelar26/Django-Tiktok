@@ -28,7 +28,7 @@ def engineviews(request):
     follower = driver.find_element_by_xpath('//*[@id="app"]/div[2]/div[2]/div/div[1]/h2[1]/div[2]/strong').text
     likes = driver.find_element_by_xpath('//*[@id="app"]/div[2]/div[2]/div/div[1]/h2[1]/div[3]/strong').text
     
-    user_link = str(request.POST["link"]) + '/video/'
+    user_link = str(request.POST.get("link")) + '/video/'
     urls = driver.find_elements_by_xpath("//a[contains(@href,'"+ user_link +"')]")[:12]
     urls = [url.get_attribute('href') for url in urls]
     views = driver.find_elements_by_xpath("//strong[contains(@data-e2e,'video-views')]")[:12]
@@ -114,8 +114,8 @@ def enginedetail(request):
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-dev-shm-usage')
-    link = str(request.POST["link"])
-    link_profile = str(request.POST["link_profile"])
+    link = str(request.POST.get["link"])
+    link_profile = str(request.POST.get["link_profile"])
     
     if link.split('/')[3] != link_profile.split('/')[3] :
         return JsonResponse('parameter link and link_profile are not match', safe=False)
