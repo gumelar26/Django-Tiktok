@@ -1,6 +1,6 @@
 Django === 4.0.5
 djangorestframework === 3.13.1
 selenium === 3.141.0
-django-cors-headers
+django-cors-headers === 3.13.0
 python-time
 pandas

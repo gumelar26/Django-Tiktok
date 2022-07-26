@@ -13,17 +13,22 @@ def engineviews(request):
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-dev-shm-usage')
-    driver = webdriver.Chrome('/usr/bin/chromedriver',options=chrome_options)
+    driver = webdriver.Chrome('/usr/local/bin/chromedriver',options=chrome_options)
     
+    print(str(request.POST["link"]))
     driver.get(str(request.POST["link"]))
     try :
         verified = driver.find_element(By.CSS_SELECTOR, "#app > div.tiktok-ywuvyb-DivBodyContainer.e1irlpdw0 > div.tiktok-w4ewjk-DivShareLayoutV2.elmjn4l0 > div > div.tiktok-1g04lal-DivShareLayoutHeader-StyledDivShareLayoutHeaderV2.elmjn4l2 > div.tiktok-1gk89rh-DivShareInfo.ekmpd5l2 > div.tiktok-1hdrv89-DivShareTitleContainer.ekmpd5l3 > h2 > svg")
         verified = True
     except :
-        verified = False
-        
-    avatars = driver.find_element_by_xpath('//*[@id="app"]/div[2]/div[2]/div/div[1]/div[1]/div[1]/span/img')
-    avatar = avatars.get_attribute('src')
+        verified = False    
+    try :
+        avatars = driver.find_element_by_xpath('//*[@id="app"]/div[2]/div[2]/div/div[1]/div[1]/div[1]/span/img')
+        avatar = avatars.get_attribute('src')
+    except:
+        avatars = driver.find_element_by_xpath('//*[@id="app"]/div[2]/div[2]/div/div[1]/div[1]/a/div/span[1]/img')
+        avatar = avatars.get_attribute('src')
+    
     following = driver.find_element_by_xpath('//*[@id="app"]/div[2]/div[2]/div/div[1]/h2[1]/div[1]/strong').text
     follower = driver.find_element_by_xpath('//*[@id="app"]/div[2]/div[2]/div/div[1]/h2[1]/div[2]/strong').text
     likes = driver.find_element_by_xpath('//*[@id="app"]/div[2]/div[2]/div/div[1]/h2[1]/div[3]/strong').text
@@ -51,7 +56,7 @@ def engineviews(request):
         'content': content
     }
     
-    ########################## Process Data ##########################
+    #****************** Process Data ******************#
     
     verified = respond['is_verified']
     avatar = respond['avatar']
@@ -114,33 +119,58 @@ def enginedetail(request):
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-dev-shm-usage')
+    print(str(request.POST["link"]))
     link = str(request.POST["link"])
+    print(str(request.POST["link_profile"]))
     link_profile = str(request.POST["link_profile"])
     
     if link.split('/')[3] != link_profile.split('/')[3] :
         return JsonResponse('parameter link and link_profile are not match', safe=False)
     else :
-        driver = webdriver.Chrome('/usr/bin/chromedriver',options=chrome_options)
+        #**************** First view detail comment, like, share ****************#
+        driver = webdriver.Chrome('/usr/local/bin/chromedriver',options=chrome_options)
+        driver.get(link + '/')
+        like = driver.find_element_by_xpath("//strong[contains(@data-e2e,'like-count')]").text
+        comment = driver.find_element_by_xpath("//strong[contains(@data-e2e,'comment-count')]").text
+        share = driver.find_element_by_xpath("//strong[contains(@data-e2e,'share-count')]").text
+        if share == "Share" :
+            share = '0'
+        else :
+            share = share
+        
+        driver.quit()
+        time.sleep(1.5)
+        #**************** Second view profile for get views ********************#
+        driver = webdriver.Chrome('/usr/local/bin/chromedriver',options=chrome_options)
         driver.get(link_profile + '/')
         try :
             views = driver.find_element_by_xpath("//a[contains(@href,'"+ link +"')]/div/div[2]/strong").text
-            ############ Process Data ###########
-            if views[-1:] == 'K' :
-                views = float(views[:-1]) * 1000
-                views = int(views)
-            elif views[-1:] == 'M' :
-                views = float(views[:-1]) * 1000000
-                views = int(views)
-            elif views[-1:] == 'B' :
-                views = float(views[:-1]) * 1000000000
-                views = int(views)
-            else :
-                views = int(views)
-
+            #**************** Process Data if exists ****************#
+            data = [views, like, comment, share]
+            for i in range(len(data)):
+                if data[i][-1:] == 'K' :
+                    data[i] = float(data[i][:-1]) * 1000
+                    data[i] = int(data[i])
+                elif data[i][-1:] == 'M' :
+                    data[i] = float(data[i][:-1]) * 1000000
+                    data[i] = int(data[i])
+                elif data[i][-1:] == 'B' :
+                    data[i] = float(data[i][:-1]) * 1000000000
+                    data[i] = int(data[i])
+                else :
+                    data[i] = int(data[i])
+            
+            views = data[0]
+            like = data[1]
+            comment = data[2]
+            share = data[3]
             respond = {
                 "status" : True,
                 "message": "succes",
                 "views" : views,
+                "like": like,
+                "comment": comment,
+                "share": share
             }
         
             driver.quit()
@@ -155,24 +185,34 @@ def enginedetail(request):
                 time.sleep(SCROLL_PAUSE_TIME)
                 try :
                     views = driver.find_element_by_xpath("//a[contains(@href,'"+ link +"')]/div/div[2]/strong").text
-                    ############ Process Data ###########
-                    if views[-1:] == 'K' :
-                        views = float(views[:-1]) * 1000
-                        views = int(views)
-                    elif views[-1:] == 'M' :
-                        views = float(views[:-1]) * 1000000
-                        views = int(views)
-                    elif views[-1:] == 'B' :
-                        views = float(views[:-1]) * 1000000000
-                        views = int(views)
-                    else :
-                        views = int(views)
-
+                    #**************** Process Data if video in deep ****************#
+                    data = [views, like, comment, share]
+                    for i in range(len(data)):
+                        if data[i][-1:] == 'K' :
+                            data[i] = float(data[i][:-1]) * 1000
+                            data[i] = int(data[i])
+                        elif data[i][-1:] == 'M' :
+                            data[i] = float(data[i][:-1]) * 1000000
+                            data[i] = int(data[i])
+                        elif data[i][-1:] == 'B' :
+                            data[i] = float(data[i][:-1]) * 1000000000
+                            data[i] = int(data[i])
+                        else :
+                            data[i] = int(data[i])
+                    
+                    views = data[0]
+                    like = data[1]
+                    comment = data[2]
+                    share = data[3]
                     respond = {
                         "status" : True,
                         "message": "succes",
                         "views" : views,
+                        "like": like,
+                        "comment": comment,
+                        "share": share
                     }
+                    
                     driver.quit()
                     time.sleep(1)
                     return JsonResponse(respond, safe=False)
