@@ -15,6 +15,7 @@ def engineviews(request):
     chrome_options.add_argument('--disable-dev-shm-usage')
     driver = webdriver.Chrome('/usr/local/bin/chromedriver',options=chrome_options)
     
+    print(str(request.POST.get("link")))
     driver.get(str(request.POST.get("link")))
     try :
         verified = driver.find_element(By.CSS_SELECTOR, "#app > div.tiktok-ywuvyb-DivBodyContainer.e1irlpdw0 > div.tiktok-w4ewjk-DivShareLayoutV2.elmjn4l0 > div > div.tiktok-1g04lal-DivShareLayoutHeader-StyledDivShareLayoutHeaderV2.elmjn4l2 > div.tiktok-1gk89rh-DivShareInfo.ekmpd5l2 > div.tiktok-1hdrv89-DivShareTitleContainer.ekmpd5l3 > h2 > svg")
