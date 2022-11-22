@@ -16,7 +16,7 @@ import procces_data
 
 app = FastAPI()
 
-@app.post("/api/scrapviews/")
+@app.post("/api/scrapviews")
 async def scrap_view(link: str = Form(...)):
     """
     Function to pull data from tiktok (raw_data)
@@ -128,7 +128,7 @@ async def scrap_view(link: str = Form(...)):
             detail="Please make sure your link is valid or contact developer if still in trouble"
         )
 
-@app.post("/api/scrapdetail/")
+@app.post("/api/scrapdetail")
 def scrap_detail(link_profile: str = Form(...), link: str = Form(...)):
     """
     Function to pull data from tiktok (detail_data)
