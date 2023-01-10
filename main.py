@@ -60,7 +60,7 @@ async def scrap_view(link: str = Form(...)):
         except :
             respond['follower'] = 'Unknown'
         try :
-            respond['likes'] = driver.find_element(By.XPATH, structure.xpath_follower).text
+            respond['likes'] = driver.find_element(By.XPATH, structure.xpath_likes).text
         except :
             respond['likes'] = 'Unknown'
 
@@ -129,7 +129,7 @@ async def scrap_view(link: str = Form(...)):
         )
 
 @app.post("/api/scrapdetail")
-def scrap_detail(link_profile: str = Form(...), link: str = Form(...)):
+async def scrap_detail(link_profile: str = Form(...), link: str = Form(...)):
     """
     Function to pull data from tiktok (detail_data)
     respond :
