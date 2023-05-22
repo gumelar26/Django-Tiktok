@@ -16,7 +16,7 @@ import procces_data
 
 app = FastAPI()
 
-@app.post("/api/scrapviews")
+@app.post("/api/scrapviews/")
 async def scrap_view(link: str = Form(...)):
     """
     Function to pull data from tiktok (raw_data)
@@ -82,26 +82,44 @@ async def scrap_view(link: str = Form(...)):
         urls = []
         for i in range(12) :
             try :
-                url = driver.find_element(By.XPATH, structure.xpath_url_func(i)).get_attribute('href')
-                if url is str('') :
-                    driver.find_element(By.XPATH, structure.xpath_click).click()
+                try :
                     url = driver.find_element(By.XPATH, structure.xpath_url_func(i)).get_attribute('href')
-                    urls.append(url)
-                else :
-                    urls.append(url)
+                    if url is str('') :
+                        driver.find_element(By.XPATH, structure.xpath_click).click()
+                        url = driver.find_element(By.XPATH, structure.xpath_url_func(i)).get_attribute('href')
+                        urls.append(url)
+                    else :
+                        urls.append(url)
+                except :
+                    url = driver.find_element(By.XPATH, structure.xpath_url_func_sec(i)).get_attribute('href')
+                    if url is str('') :
+                        driver.find_element(By.XPATH, structure.xpath_click).click()
+                        url = driver.find_element(By.XPATH, structure.xpath_url_func_sec(i)).get_attribute('href')
+                        urls.append(url)
+                    else :
+                        urls.append(url)
             except :
                 urls.append('Unknown')
 
         views = []
         for i in range(12) :
             try :
-                view = driver.find_element(By.XPATH, structure.xpath_view_func(i)).text
-                if view is str('') :
-                    driver.find_element(By.XPATH, structure.xpath_click).click()
+                try :
                     view = driver.find_element(By.XPATH, structure.xpath_view_func(i)).text
-                    views.append(view)
-                else :
-                    views.append(view)
+                    if view is str('') :
+                        driver.find_element(By.XPATH, structure.xpath_click).click()
+                        view = driver.find_element(By.XPATH, structure.xpath_view_func(i)).text
+                        views.append(view)
+                    else :
+                        views.append(view)
+                except :
+                    view = driver.find_element(By.XPATH, structure.xpath_view_func_sec(i)).text
+                    if view is str('') :
+                        driver.find_element(By.XPATH, structure.xpath_click).click()
+                        view = driver.find_element(By.XPATH, structure.xpath_view_func_sec(i)).text
+                        views.append(view)
+                    else :
+                        views.append(view)
             except :
                 views.append('Unknown')
 
@@ -128,7 +146,7 @@ async def scrap_view(link: str = Form(...)):
             detail="Please make sure your link is valid or contact developer if still in trouble"
         )
 
-@app.post("/api/scrapdetail")
+@app.post("/api/scrapdetail/")
 async def scrap_detail(link_profile: str = Form(...), link: str = Form(...)):
     """
     Function to pull data from tiktok (detail_data)
